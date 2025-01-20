@@ -11,7 +11,7 @@ cd <project-root>/database/
 ./create.sh
 ```
 
-This Bash script drops the existing database, if necessary, creates a new database named `final_capstone`, and runs the various SQL scripts in the correct order. You don't need to modify the Bash script unless you want to change the database name.
+This Bash script drops the existing database, if necessary, creates a new database named `pokemon_app`, and runs the various SQL scripts in the correct order. You don't need to modify the Bash script unless you want to change the database name.
 
 Each SQL script has a specific purpose as described here:
 
@@ -28,8 +28,8 @@ The database superuser—meaning `postgres`—must only be used for database adm
 
 | Username | Description |
 | -------- | ----------- |
-| `final_capstone_owner` | This user is the schema owner. It has full access—meaning granted all privileges—to all database objects within the `capstone` schema and also has privileges to create new schema objects. This user can be used to connect to the database from PGAdmin for administrative purposes. |
-| `final_capstone_appuser` | The application uses this user to make connections to the database. This user is granted `SELECT`, `INSERT`, `UPDATE`, and `DELETE` privileges for all database tables and can `SELECT` from all sequences. The application datasource has been configured to connect using this user. |
+| `pokemon_app_owner` | This user is the schema owner. It has full access—meaning granted all privileges—to all database objects within the `capstone` schema and also has privileges to create new schema objects. This user can be used to connect to the database from PGAdmin for administrative purposes. |
+| `pokemon_app_appuser` | The application uses this user to make connections to the database. This user is granted `SELECT`, `INSERT`, `UPDATE`, and `DELETE` privileges for all database tables and can `SELECT` from all sequences. The application datasource has been configured to connect using this user. |
 
 
 ## Spring Boot
@@ -41,9 +41,9 @@ A Datasource has been configured for you in `/src/resources/application.properti
 
 ```
 # datasource connection properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/final_capstone
-spring.datasource.name=final_capstone
-spring.datasource.username=final_capstone_appuser
+spring.datasource.url=jdbc:postgresql://localhost:5432/pokemon_app
+spring.datasource.name=pokemon_app
+spring.datasource.username=pokemon_app_appuser
 spring.datasource.password=finalcapstone
 ```
 
