@@ -7,11 +7,11 @@
 
       <div>
         Results per page:
-        <ul>
-          <li class="selected">10</li>
-          <li>20</li>
-          <li>50</li>
-        </ul>
+        <span class="selected">
+          <button>10</button>
+          <button>20</button>
+          <button>50</button>
+        </span>
       </div>
     </section>
     
@@ -33,7 +33,7 @@ import pokeApiService from '../services/PokeApiService'
 export default {
 
   created() {
-    pokeApiService.getMore()
+    pokeApiService.getMore(this.offset, this.pageLimit)
       .then(response => {
         this.pokemonArray = response.data.results.map(result => {
           const indexOfPokemon = result.url.lastIndexOf('pokemon/');
@@ -50,6 +50,8 @@ export default {
 
   data() {
     return {
+      pageLimit: 10,
+      offset: 0,
       pokemonArray: []
     }
   }
@@ -69,7 +71,7 @@ export default {
   border: 1px solid black;
   border-radius: 8px;
   padding: 10px;
-
+  background-color: antiquewhite;
   display: flex;
   flex-direction: column;
   justify-content: center;

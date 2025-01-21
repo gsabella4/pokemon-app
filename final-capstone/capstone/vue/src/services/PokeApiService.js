@@ -10,8 +10,8 @@ export default {
         return http.get(`/pokemon/${idOrName}`)
     },
     
-    getMore() {
-        return http.get('/pokemon')
+    getMore(offset, limit) {
+        return http.get(`pokemon?offset=${offset}&limit=${limit}`)
     }
 
 };
