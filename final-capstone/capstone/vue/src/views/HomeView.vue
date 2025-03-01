@@ -38,7 +38,9 @@ export default {
 
   created() {
     if (this.$route.query.resultsPerPage != null) {
-      this.paging.resultsPerPage.selectedOption = Number(this.$route.query.resultsPerPage); //may want to check if this valid #
+      if (isNaN(Number(this.$route.query.resultsPerPage))) {
+        this.paging.resultsPerPage.selectedOption = Number(this.$route.query.resultsPerPage);
+      }
     }
 
     if (this.$route.query.offset != null) {
