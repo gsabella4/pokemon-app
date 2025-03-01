@@ -1,5 +1,5 @@
-# Final Capstone
-​
-This directory contains all of the starter projects for the final capstone.​Each project contains instructions that provides information about the starting code and explains how to get started with the final capstone project.
+# Pokemon App
+
+This repository contains a web application that leverages the PokeAPI to explore Pokémon characters. Users can search for Pokémon, view detailed information including evolution lines, and save their favorites for easy access.
 
 This version uses JDK 11 and Vue 3
