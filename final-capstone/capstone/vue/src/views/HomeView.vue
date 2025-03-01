@@ -1,17 +1,21 @@
 <template>
-  <div class="home">
+  <div class="content-box">
     <h1>All Pokémon</h1>
-    <section>
-      <button>Prev</button>
-      <button>Next</button>
-
+    <section id="paging-section"> <!-- Could Move paging-section into its own component -->
       <div>
+        <button v-show="this.paging.offset > 0" @click="prevPage()">Prev</button>
+        <button @click="nextPage()">Next</button>
+      </div>
+
+      <div id="results-per-page">
         Results per page:
-        <span class="selected">
-          <button>10</button>
-          <button>20</button>
-          <button>50</button>
-        </span>
+        <ul>
+          <li :class="{ 'selected': opt == paging.resultsPerPage.selectedOption }" 
+            v-for="opt in paging.resultsPerPage.options" :key="`results-per-page-opt-${opt}`"
+            @click="updateResultsPerPage(opt)">
+            {{ opt }}
+          </li>
+        </ul>
       </div>
     </section>
     
@@ -33,7 +37,35 @@ import pokeApiService from '../services/PokeApiService'
 export default {
 
   created() {
-    pokeApiService.getMore(this.offset, this.pageLimit)
+    if (this.$route.query.resultsPerPage != null) {
+      this.paging.resultsPerPage.selectedOption = Number(this.$route.query.resultsPerPage); //may want to check if this valid #
+    }
+
+    if (this.$route.query.offset != null) {
+      this.paging.offset = Number(this.$route.query.offset);
+    }
+
+    this.getMore()
+  },
+
+  data() {
+    return {
+      paging: {
+        offset: 0,
+
+        resultsPerPage: {
+          options: [10, 20, 50],
+          selectedOption: 20
+        }
+      },
+
+      pokemonArray: []
+    }
+  },
+
+  methods: {
+    getMore() {
+      pokeApiService.getMore(this.paging.offset, this.paging.resultsPerPage.selectedOption)
       .then(response => {
         this.pokemonArray = response.data.results.map(result => {
           const indexOfPokemon = result.url.lastIndexOf('pokemon/');
@@ -46,13 +78,38 @@ export default {
           }
         });
       });
-  },
+    },
 
-  data() {
-    return {
-      pageLimit: 10,
-      offset: 0,
-      pokemonArray: []
+    updateResultsPerPage(val) {
+      this.paging.resultsPerPage.selectedOption = val;
+      this.getMore();
+      this.updateUrl();
+    },
+
+    updateUrl() {
+      const queryObj = {
+        resultsPerPage: this.paging.resultsPerPage.selectedOption, 
+        offset: this.paging.offset
+        };
+
+      this.$router.replace({ name: this.$route.name, query: queryObj });
+    },
+
+    prevPage() {
+      this.paging.offset -= this.paging.resultsPerPage.selectedOption;
+
+      if (this.paging.offset < 0) {
+        this.paging.offset = 0;
+      }
+
+      this.getMore();
+      this.updateUrl();
+    },
+
+    nextPage() {
+      this.paging.offset += this.paging.resultsPerPage.selectedOption;
+      this.getMore();
+      this.updateUrl();
     }
   }
 
@@ -61,10 +118,49 @@ export default {
 
 <style scoped>
 
+#paging-section {
+  border-bottom: 1px solid var(--color-poke-blue);
+  padding-bottom: .25rem;
+  margin-bottom: .25rem;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+#results-per-page {
+  display: flex;
+}
+
+#results-per-page ul {
+  display: flex;
+  flex-grow: 1;
+  gap: 4px;
+}
+
+#results-per-page li {
+  list-style-type: none;
+  border: 2px solid var(--color-poke-blue);
+  border-radius: 10px;
+  cursor: pointer;
+  width: 35px;
+  text-align: center;
+}
+
+#results-per-page li.selected {
+  background-color: var(--color-poke-blue);
+  color: var(--color-poke-yellow);
+  cursor: default;
+}
+
 #pokemon-list {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  max-height: 30vw;
+  overflow-y: auto;
+  scrollbar-color: var(--color-poke-yellow-80) var(--color-poke-blue);
+  scrollbar-width: thin;
 }
 
 .pokemon-card {

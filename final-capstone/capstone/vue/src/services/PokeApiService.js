@@ -10,8 +10,12 @@ export default {
         return http.get(`/pokemon/${idOrName}`)
     },
     
-    getMore(offset, limit) {
+    getMore(offset=0, limit=20) {
         return http.get(`pokemon?offset=${offset}&limit=${limit}`)
+    },
+
+    getTypes() {
+        return http.get('/type?limit=21');
     }
 
 };

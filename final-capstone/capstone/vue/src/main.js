@@ -1,3 +1,4 @@
+import './assets/main.css'
 import { createApp } from 'vue'
 import CapstoneApp from './App.vue'
 import { createStore } from './store'
