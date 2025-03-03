@@ -9,8 +9,9 @@
     </header>
     <section id="paging-section"> <!-- Could Move paging-section into its own component -->
       <div>
-        <button v-show="this.paging.offset > 0" @click="prevPage()">Prev</button>
-        <button @click="nextPage()">Next</button>
+        <button v-show="paging.offset > 0" @click="prevPage()">Prev</button>
+        <button v-show="paging.offset + paging.resultsPerPage.selectedOption < paging.totalCount" 
+          @click="nextPage()">Next</button>
       </div>
 
       <div id="results-per-page">
@@ -26,12 +27,7 @@
     </section>
     
     <section id='pokemon-list'>
-
-      <router-link :to="{name: 'pokemon-detail', params: { id: pokemon.id } }" class="pokemon-card" v-for="pokemon in pokemonArray" :key="pokemon.name">
-        <img :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`"/>
-        {{ pokemon.name }}
-      </router-link>
-
+      <pokemon-card v-for="currentPokemon in pokemonArrayFiltered" :key="currentPokemon.name" :pokemon="currentPokemon" />
     </section>
 
   </div>
@@ -39,14 +35,17 @@
 
 <script>
 import pokeApiService from '../services/PokeApiService'
+import PokemonCard from '../components/PokemonCard.vue'
 import PokemonTypeImage from '../components/PokemonTypeImage.vue'
 
 export default {
   components: {
-    PokemonTypeImage
+    PokemonTypeImage,
+    PokemonCard
   },
 
   created() {
+
     if (this.$route.query.resultsPerPage != null) {
       if (isNaN(Number(this.$route.query.resultsPerPage))) {
         this.paging.resultsPerPage.selectedOption = Number(this.$route.query.resultsPerPage);
@@ -64,6 +63,7 @@ export default {
     return {
       paging: {
         offset: 0,
+        totalCount: 0,
 
         resultsPerPage: {
           options: [10, 20, 50],
@@ -77,19 +77,20 @@ export default {
 
   methods: {
     getMore() {
-      pokeApiService.getMore(this.paging.offset, this.paging.resultsPerPage.selectedOption)
-      .then(response => {
-        this.pokemonArray = response.data.results.map(result => {
-          const indexOfPokemon = result.url.lastIndexOf('pokemon/');
-          const indexOfLastSlash = result.url.lastIndexOf('/');
-          const id = result.url.substring(indexOfPokemon + 8, indexOfLastSlash);
-
-          return {
-            id: id,
-            name: result.name
-          }
-        });
-      });
+      if (this.typeId != null) {
+        pokeApiService.getTypeDetails(this.typeId)
+          .then(response => {
+            const pokemonForType = response.data.pokemon.map(obj => obj.pokemon);
+            this.pokemonArray = pokemonForType.map(this.mapPokemonObjFromApi);
+            this.paging.totalCount = this.pokemonArray.length;
+          });
+      } else {
+        pokeApiService.getMore(this.paging.offset, this.paging.resultsPerPage.selectedOption)
+          .then(response => {
+            this.pokemonArray = response.data.results.map(this.mapPokemonObjFromApi);
+            this.paging.totalCount = response.data.count;
+          });
+      }
     },
 
     updateResultsPerPage(val) {
@@ -105,6 +106,17 @@ export default {
         };
 
       this.$router.replace({ name: this.$route.name, query: queryObj });
+    },
+
+    mapPokemonObjFromApi(result) {
+      const indexOfPokemon = result.url.lastIndexOf('pokemon/');
+      const indexOfLastSlash = result.url.lastIndexOf('/');
+      const id = result.url.substring(indexOfPokemon + 8, indexOfLastSlash);
+
+      return {
+        id: id,
+        name: result.name
+      }
     },
 
     prevPage() {
@@ -126,6 +138,14 @@ export default {
   },
 
   computed: {
+    pokemonArrayFiltered() {
+      if (this.typeId != null) {
+        return this.pokemonArray.filter((item, index) => this.paging.offset <= index && index < this.paging.offset + this.paging.resultsPerPage.selectedOption)
+      } else {
+        return this.pokemonArray;
+      }
+    },
+
     typeId() {
       return this.$route.params.typeId;
     }
@@ -186,16 +206,6 @@ header {
   scrollbar-width: thin;
 }
 
-.pokemon-card {
-  border: 1px solid black;
-  border-radius: 8px;
-  padding: 10px;
-  background-color: antiquewhite;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-}
+
 
 </style>

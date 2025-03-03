@@ -1,7 +1,7 @@
 <template>
   <div id="pokemon-app">
     <nav-bar id="main-nav"/>
-    <router-view />
+    <router-view :key="$route.path"/>
   </div>
 </template>
 
