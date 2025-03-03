@@ -1,18 +1,24 @@
 <template>
   <div id="pokemon-app">
-    <div id="nav" class="content-box">
-      <router-link v-bind:to="{ name: 'home' }">View All</router-link>&nbsp;|&nbsp;
-      <router-link v-bind:to="{ name: 'types' }">View Types</router-link>&nbsp;|&nbsp;
-      <router-link v-bind:to="{ name: 'logout' }" v-if="$store.state.token != ''">Logout</router-link>
-    </div>
+    <nav-bar id="main-nav"/>
     <router-view />
   </div>
 </template>
 
+<script>
+import NavBar from './components/NavBar.vue'
+
+export default {
+  components : {
+    NavBar
+  }
+}
+
+</script>
+
 <style>
 
-
-#nav {
+#main-nav {
   margin-bottom: 1rem;
 }
 

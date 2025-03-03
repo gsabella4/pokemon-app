@@ -1,17 +1,23 @@
 <template>
     <div id="type-container" class="content-box">
-        
-        <div v-for="type in types" :key="type">
-            <img :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/types/generation-iii/colosseum/${type}.png`">
-        </div>
-
+        <pokemon-type-image 
+        class="pokemon-type"
+        v-for="typeId in types" 
+        :key="typeId" 
+        :type-id="typeId"
+        @click="goToTypeDetailsPage(typeId)"/>
     </div>
 </template>
 
 <script>
 import pokeApiService from '../services/PokeApiService.js';
+import PokemonTypeImage from '../components/PokemonTypeImage.vue';
 
 export default {
+  components: {
+    PokemonTypeImage
+  },
+
     created() {
         pokeApiService.getTypes().then(response => {
                 const data = response.data.results;
@@ -30,6 +36,12 @@ export default {
         return {
             types: []
         }
+    },
+
+    methods: {
+        goToTypeDetailsPage(typeId) {
+            this.$router.push({ name: 'type-details', params: {typeId: typeId }})
+        }
     }
 }
 </script>
@@ -40,6 +52,10 @@ export default {
         display: flex;
         flex-wrap: wrap;
         gap: .5rem;
+    }
+
+    img.pokemon-type {
+        cursor: pointer;
     }
 
 </style>

@@ -1,6 +1,12 @@
 <template>
   <div class="content-box">
-    <h1>All Pokémon</h1>
+    <header v-if="typeId != null">
+      <pokemon-type-image :type-id="typeId"/>
+      <h1>Pokémon</h1>
+    </header>
+    <header v-else>
+      <h1>All Pokémon</h1>
+    </header>
     <section id="paging-section"> <!-- Could Move paging-section into its own component -->
       <div>
         <button v-show="this.paging.offset > 0" @click="prevPage()">Prev</button>
@@ -33,8 +39,12 @@
 
 <script>
 import pokeApiService from '../services/PokeApiService'
+import PokemonTypeImage from '../components/PokemonTypeImage.vue'
 
 export default {
+  components: {
+    PokemonTypeImage
+  },
 
   created() {
     if (this.$route.query.resultsPerPage != null) {
@@ -113,12 +123,23 @@ export default {
       this.getMore();
       this.updateUrl();
     }
+  },
+
+  computed: {
+    typeId() {
+      return this.$route.params.typeId;
+    }
   }
 
 };
 </script>
 
 <style scoped>
+header {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 1.5rem;
+}
 
 #paging-section {
   border-bottom: 1px solid var(--color-poke-blue);
@@ -159,7 +180,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  max-height: 30vw;
+  max-height: 50vh;
   overflow-y: auto;
   scrollbar-color: var(--color-poke-yellow-80) var(--color-poke-blue);
   scrollbar-width: thin;
