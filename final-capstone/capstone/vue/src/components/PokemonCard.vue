@@ -22,16 +22,12 @@ export default {
   border: 1px solid var(--color-poke-blue);
   border-radius: 8px;
   padding: 10px;
-  background-color: antiquewhite;
+  
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 8px;
-}
-
-.pokemon-card:hover {
-    background-color: lightyellow;
 }
 
 </style>
